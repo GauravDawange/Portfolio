@@ -133,12 +133,21 @@ const ExperienceDetailModal = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black overflow-y-auto"
+            className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-xl overflow-y-auto"
+            onClick={onClose}
         >
+            <motion.div
+                initial={{ opacity: 0, y: 60, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 40, scale: 0.95 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="relative max-w-6xl mx-auto my-8 md:my-16 px-4 sm:px-6"
+                onClick={(e) => e.stopPropagation()}
+            >
             {/* Close button */}
             <button
                 onClick={onClose}
-                className="fixed top-4 right-4 md:top-8 md:right-8 z-[210] p-2 md:p-3 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 text-white transition-all"
+                className="fixed top-4 right-4 md:top-8 md:right-8 z-[210] w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all hover:scale-110"
             >
                 <X className="w-5 h-5 md:w-6 md:h-6" />
             </button>
@@ -256,6 +265,9 @@ const ExperienceDetailModal = ({
                     <ScreenshotMarquee images={exp.images} accentColor={exp.accentColor} isPaused={lightboxIdx !== null} onImageClick={(idx) => setLightboxIdx(idx)} />
                 )}
             </div>
+
+            </div>
+            </motion.div>
 
             {/* Lightbox */}
             <AnimatePresence>
@@ -392,11 +404,11 @@ interface CardProps {
     range: [number, number];
     targetScale: number;
     isLast: boolean;
+    onViewMore: () => void;
 }
 
-const Card = ({ exp, i, progress, range, targetScale, isLast }: CardProps) => {
+const Card = ({ exp, i, progress, range, targetScale, isLast, onViewMore }: CardProps) => {
     const container = useRef(null);
-    const [showDetail, setShowDetail] = useState(false);
     const { scrollYProgress } = useScroll({
         target: container,
         offset: ['start end', 'start start']
@@ -464,7 +476,7 @@ const Card = ({ exp, i, progress, range, targetScale, isLast }: CardProps) => {
                             ))}
 
                             <button
-                                onClick={() => setShowDetail(true)}
+                                onClick={onViewMore}
                                 className="inline-flex items-center h-10 md:h-12 px-5 md:px-6 rounded-full text-white gap-2 text-sm md:text-base font-medium transition-all hover:scale-105 active:scale-95 border"
                                 style={{ borderColor: exp.accentColor + "50", backgroundColor: exp.accentColor + "20" }}
                             >
@@ -505,24 +517,20 @@ const Card = ({ exp, i, progress, range, targetScale, isLast }: CardProps) => {
                 </div>
             </motion.div>
 
-            {/* Detail Modal */}
-            <AnimatePresence>
-                {showDetail && (
-                    <ExperienceDetailModal exp={exp} onClose={() => setShowDetail(false)} />
-                )}
-            </AnimatePresence>
         </div>
     );
 };
 
 export function Experience() {
     const container = useRef(null);
+    const [selectedExp, setSelectedExp] = useState<Experience | null>(null);
     const { scrollYProgress } = useScroll({
         target: container,
         offset: ['start start', 'end end']
     });
 
     return (
+        <>
         <div ref={container} className="relative h-[300vh] md:h-[400vh] bg-background">
             {/* Header */}
             <div className="relative z-10 py-6 md:py-8 text-center bg-background pt-16 md:pt-24 pb-8 md:pb-12">
@@ -554,9 +562,18 @@ export function Experience() {
                         range={range}
                         targetScale={targetScale}
                         isLast={i === experiences.length - 1}
+                        onViewMore={() => setSelectedExp(exp)}
                     />
                 );
             })}
         </div>
+
+        {/* Experience Detail Modal – rendered at top level (outside sticky/overflow containers) */}
+        <AnimatePresence>
+            {selectedExp && (
+                <ExperienceDetailModal exp={selectedExp} onClose={() => setSelectedExp(null)} />
+            )}
+        </AnimatePresence>
+        </>
     );
 }
