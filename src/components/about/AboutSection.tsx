@@ -226,8 +226,7 @@ export function AboutSection() {
                             <h2 className="text-lg font-bold text-white mb-3">Experience</h2>
                             <div className="space-y-3">
                                 {[
-                                    { year: "July 2025 – Present", role: "Software Engineer", company: "Alhat Holdings" },
-                                    { year: "Feb 2025 – June 2025", role: "Full Stack Java Developer", company: "Codeft Technology" },
+                                    { year: "March 2025 – Present", role: "Software Engineer", company: "Alhat Holdings" },
                                     { year: "April 2024 – July 2024", role: "Software Developer Intern", company: "HashedBit Innovations" },
                                 ].map((job, i) => (
                                     <div key={i} className="group flex flex-col items-start border-b border-white/5 pb-2 last:border-0 hover:bg-white/5 p-2 -mx-2 rounded-lg transition-colors cursor-default">
